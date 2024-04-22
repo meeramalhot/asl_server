@@ -1,13 +1,10 @@
 CC = gcc
 CFLAGS = -g
 
-all: webserv httphelp
+all: webserv
 
 webserv: webserv.c httphelp.h
-	$(CC) $(CFLAGS) -lpthread -o webserv webserv.c
-
-httphelp: httphelp.c httphelp.h
-	$(CC) $(CFLAGS) -o httphelp httphelp.c
+	$(CC) $(CFLAGS) -lpthread -o webserv webserv.c httphelp.c
 
 clean:
-	rm -f *.o *~
+	rm -f *.o *~ webserv

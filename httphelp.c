@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 //get file descriptor to read and write to fd, will return -1 if file does not exist
 FILE * get_file_descriptor(const char *file_name){
@@ -25,46 +26,45 @@ long int get_file_size(FILE * f) {
 
 const char * get_mime(char *file)
 {
-  char * mime[50];
   //find where filetype is and incrament by one to not include dot
   const char *dot = strrchr(file, '.');
   dot++;
   //if period not found
   if (dot == NULL) {
-    strcpy(mime, "text/html"); 
+    return "text/html"; 
   }
   else if (strcasecmp(dot, "html") == 0) {
-    strcpy(mime, "text/html");
+    return "text/html"; 
   }
   else if (strcasecmp(dot, "txt") == 0) {
-    strcpy(mime,"text/plain");
+    return "text/plain"; 
   }
   else if (strcasecmp(dot, "css") == 0) {
-    strcpy(mime, "text/css");
+    return "text/css";
   }
   else if (strcasecmp(dot, "js") == 0) {
-    strcpy(mime, "application/js");
+    return "application/js";
   }
-  else if (strcasecmp(dot, "jpg" == 0) || strcasecmp(dot, "jpeg") == 0) {
-    strcpy(mime, "image/jpeg");
+  else if (strcasecmp(dot, "jpg") == 0 || strcasecmp(dot, "jpeg") == 0) {
+    return "image/jpeg";
   }
   else if (strcasecmp(dot, "png") == 0) {
-    strcpy(mime, "image/png");
+    return "image/png";
   }
   else if (strcasecmp(dot, "gif") == 0) {
-    strcpy(mime, "image/gif");
+    printf("we reach gif \n");
+    return "image/gif";
   }
   /*FIX*/
   else if (strcasecmp(dot, "cgi") == 0) {
-    strcpy(mime, "image/gif");
+    return "image/gif";
   }
   else {
-    strcpy(mime, "text/html"); 
+    return "text/html"; 
   }
-
-  return mime;
 }
 
+/*
 const char * format_time(void){
     char output[40];
     time_t rawtime;
@@ -78,3 +78,4 @@ const char * format_time(void){
             timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
     return output;
 }
+*/

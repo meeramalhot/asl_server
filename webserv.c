@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include "httphelp.h"
 
 
@@ -16,21 +17,22 @@
 #define NOT_FOUND 404
 #define OK 200
 
-#define MAX_FIELDS 5
+#define MAX_FIELDS 32
 
 typedef struct {
   char * key;
   char * value;
 } header_field;
 
-void make_https_response(int status_code, int *desc, char *content, const char *content_type);
+void make_https_response(int status_code, int desc, char *content, const char *content_type, long int content_length);
+void *request_deal(void *socket_descriptor) ;
 
 void myServ(int port) {
 
   int sd, new_sd;
   struct sockaddr_in name, client_name;
   int sock_opt_val = 1;
-  int client_len;
+  unsigned int client_len;
   char data[80];		/* Our receive data buffer. */
   
   //create socket
@@ -72,9 +74,8 @@ void myServ(int port) {
       //thread to handle new request
       pthread_t request_thread;
       pthread_create(&request_thread, NULL, request_deal, (void *)new_sd);
+      printf("we create the thread \n");
       pthread_detach(request_thread);
-
-	    exit (0);
   }
   //FIGURE OUT HOW TO CLOSE
   //close(new_sd);
@@ -83,31 +84,41 @@ void myServ(int port) {
 //parse HTTPS requests here
 void *request_deal(void *socket_descriptor) {
   //make sure desc is an int
-  int * desc = (int *)socket_descriptor;
+  int desc = (int)socket_descriptor;
 
   char buffer[BUFFER_SIZE];
   memset(buffer, 0, BUFFER_SIZE);
   //number of characters recieved, stored into buffer
-  ssize_t buff_rec = recv(*desc, buffer, BUFFER_SIZE, 0);
+  ssize_t buff_rec = recv(desc, buffer, BUFFER_SIZE, 0);
 
   char * get_http = strtok(buffer, " ");
+  if(get_http == NULL) {
+    return NULL;
+  }
   printf("This is the HTTP request:%s\n", get_http);
 
   //not equal
   if(strcmp(get_http, "GET") != 0) {
-    make_https_response(UNDEFINED, desc, NULL, "text/html");
+    make_https_response(UNDEFINED, desc, NULL, "text/html", 0);
     return NULL;
   }
 
   char * file_name = strtok(NULL, " ");
-  printf("This is the filename:%s\n", file_name);
+  //check if filename starts with a slash and ignore it
+  if(file_name[0] == '/') {
+    //start at the second char
+    file_name = &file_name[1];
+  }
+
+  printf("This is the filename: %s\n", file_name);
 
   char * version = strtok(NULL, "\n");
   printf("This is the version:%s\n", version);
 
   //check if HTTP versions are corrext
-  if(strcmp(version, "HTTP/1.1") != 0 && (strcmp(version, "HTTP/1.0") != 0)) {
-    make_https_response(UNDEFINED, desc, NULL, "text/html");
+  if(strncmp(version, "HTTP/1.1", 8) != 0 && (strncmp(version, "HTTP/1.0", 8) != 0)) {
+    printf("version compare failed\n");
+    make_https_response(UNDEFINED, desc, NULL, "text/html", 0);
     return NULL;
   }
 
@@ -120,35 +131,39 @@ void *request_deal(void *socket_descriptor) {
   for(int i = 0; i < MAX_FIELDS; i++) {
     headers[i].key = strtok(NULL, ":");
     printf("this is headers[i].key: %s, this is i: %d \n", headers[i].key, i);
-    if(headers[i].key == NULL) {
+    if(headers[i].key == NULL || strcmp(headers[i].key, "\n") == 0) {
       break;
     }
     headers[i].value = strtok(NULL, "\n");
     printf("this is headers[i].value: %s, this is i: %d \n", headers[i].value, i);
+    if(headers[i].value == NULL || strcmp(headers[i].value, "\n") == 0) {
+      break;
+    }
   }
 
   FILE * fd = get_file_descriptor(file_name);
   if (fd == NULL) {
     //not found
-    make_https_response(NOT_FOUND, desc, NULL, "text/html");
+    make_https_response(NOT_FOUND, desc, NULL, "text/html", 0);
     return NULL;
   } else {
     //found
     long int size = get_file_size(fd);
     //stores file contents in content buffer
-    char content_buffer[size];
+    char * content_buffer = malloc(size);
     fread(content_buffer, 1, size, fd);
-    make_https_response(OK, desc, content_buffer, get_mime(file_name));
+    make_https_response(OK, desc, content_buffer, get_mime(file_name), size);
 
     return NULL;
   }
   
 }
 
-void make_https_response(int status_code, int *desc, char *content, const char *content_type) {
+void make_https_response(int status_code, int desc, char *content, const char *content_type, long int content_length) {
   char * status_name;
   char header[40];
 
+  printf("This is the status code: %d\n", status_code);
   switch(status_code) {
     case OK:
       status_name = "OK";
@@ -161,16 +176,19 @@ void make_https_response(int status_code, int *desc, char *content, const char *
   }
 
   sprintf(header, "HTTP/1.1 %d %s\n", status_code, status_name);
-  send(*desc, header, strlen(header), 0);
+  send(desc, header, strlen(header), 0);
   sprintf(header, "Content-type: %s\n\n", content_type);
 
   //?
   memset(header, 0, sizeof(header));
 
-  send(*desc, header, strlen(header), 0);
+  send(desc, header, strlen(header), 0);
   if(content != NULL) {
-    send(*desc, content, strlen(content), 0);
+    send(desc, content, content_length, 0);
   }
+  send(desc, "\n", strlen("\n"), 0);
+  printf("we get to the end of send\n");
+  close(desc);
 }
 
 int main (int argc, char *argv[]) {
