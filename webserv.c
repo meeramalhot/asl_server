@@ -77,8 +77,7 @@ void myServ(int port) {
       printf("we create the thread \n");
       pthread_detach(request_thread);
   }
-  //FIGURE OUT HOW TO CLOSE
-  //close(new_sd);
+
 }
 
 //parse HTTPS requests here
