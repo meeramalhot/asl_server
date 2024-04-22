@@ -3,3 +3,4 @@
 *.o
 webserv
 *.DYSM
+*.DYSM/Contents
