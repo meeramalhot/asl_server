@@ -23,6 +23,8 @@ typedef struct {
   char * value;
 } header_field;
 
+void make_https_response(int status_code, int *desc, char *content, char *content_type);
+
 void myServ(int port) {
 
   int sd, new_sd;
@@ -74,7 +76,8 @@ void myServ(int port) {
 
 	    exit (0);
   }
-  close(new_sd);
+  //FIGURE OUT HOW TO CLOSE
+  //close(new_sd);
 }
 
 //parse HTTPS requests here
@@ -88,7 +91,7 @@ void *request_deal(void *socket_descriptor) {
   ssize_t buff_rec = recv(*desc, buffer, BUFFER_SIZE, 0);
 
   char * get_http = strtok(buffer, " ");
-  printf("This is the HTTP request:%s\n");
+  printf("This is the HTTP request:%s\n", get_http);
 
   //not equal
   if(strcmp(get_http, "GET") != 0) {
@@ -97,10 +100,10 @@ void *request_deal(void *socket_descriptor) {
   }
 
   char * file_name = strtok(NULL, " ");
-  printf("This is the filename:%s\n");
+  printf("This is the filename:%s\n", file_name);
 
   char * version = strtok(NULL, "\n");
-  printf("This is the version:%s\n");
+  printf("This is the version:%s\n", version);
 
   //check if HTTP versions are corrext
   if(strcmp(version, "HTTP/1.1") != 0 && (strcmp(version, "HTTP/1.0") != 0)) {
