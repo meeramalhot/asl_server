@@ -23,7 +23,7 @@ typedef struct {
   char * value;
 } header_field;
 
-void make_https_response(int status_code, int *desc, char *content, char *content_type);
+void make_https_response(int status_code, int *desc, char *content, const char *content_type);
 
 void myServ(int port) {
 
@@ -145,7 +145,7 @@ void *request_deal(void *socket_descriptor) {
   
 }
 
-void make_https_response(int status_code, int *desc, char *content, char *content_type) {
+void make_https_response(int status_code, int *desc, char *content, const char *content_type) {
   char * status_name;
   char header[40];
 
