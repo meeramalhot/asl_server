@@ -88,20 +88,24 @@ void *request_deal(void *socket_descriptor) {
   ssize_t buff_rec = recv(*desc, buffer, BUFFER_SIZE, 0);
 
   char * get_http = strtok(buffer, " ");
+  printf("This is the HTTP request:%s\n");
 
   //not equal
   if(strcmp(get_http, "GET") != 0) {
     make_https_response(UNDEFINED, desc, NULL, "text/html");
-    return;
+    return NULL;
   }
 
   char * file_name = strtok(NULL, " ");
+  printf("This is the filename:%s\n");
+
   char * version = strtok(NULL, "\n");
+  printf("This is the version:%s\n");
 
   //check if HTTP versions are corrext
   if(strcmp(version, "HTTP/1.1") != 0 && (strcmp(version, "HTTP/1.0") != 0)) {
     make_https_response(UNDEFINED, desc, NULL, "text/html");
-    return;
+    return NULL;
   }
 
   //ADD FLAG FOR TYPE OF HTTP
@@ -121,10 +125,10 @@ void *request_deal(void *socket_descriptor) {
   }
 
   FILE * fd = get_file_descriptor(file_name);
-  if (fd == -1) {
+  if (fd == NULL) {
     //not found
     make_https_response(NOT_FOUND, desc, NULL, "text/html");
-    return ;
+    return NULL;
   } else {
     //found
     long int size = get_file_size(fd);
@@ -133,7 +137,7 @@ void *request_deal(void *socket_descriptor) {
     fread(content_buffer, 1, size, fd);
     make_https_response(OK, desc, content_buffer, get_mime(file_name));
 
-    return;
+    return NULL;
   }
   
 }
@@ -168,7 +172,7 @@ void make_https_response(int status_code, int *desc, char *content, char *conten
 
 int main (int argc, char *argv[]) {
   int port;
-  port = argv[1];
+  port = atoi(argv[1]);
   
   myServ(port);		/* Server port. */
 
