@@ -8,5 +8,6 @@ webserv: webserv.c httphelp.h
 
 httphelp: httphelp.c httphelp.h
 	$(CC) $(CFLAGS) -o httphelp httphelp.c
+
 clean:
 	rm -f *.o *~
