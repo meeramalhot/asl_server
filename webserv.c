@@ -94,7 +94,6 @@ void *request_deal(void *socket_descriptor) {
   if(get_http == NULL) {
     return NULL;
   }
-  printf("This is the HTTP request:%s\n", get_http);
 
   //not equal
   if(strcmp(get_http, "GET") != 0) {
@@ -109,10 +108,7 @@ void *request_deal(void *socket_descriptor) {
     file_name = &file_name[1];
   }
 
-  printf("This is the filename: %s\n", file_name);
-
   char * version = strtok(NULL, "\n");
-  printf("This is the version:%s\n", version);
 
   //check if HTTP versions are corrext
   if(strncmp(version, "HTTP/1.1", 8) != 0 && (strncmp(version, "HTTP/1.0", 8) != 0)) {
@@ -175,17 +171,14 @@ void make_https_response(int status_code, int desc, char *content, const char *c
   }
 
   sprintf(header, "HTTP/1.1 %d %s\n", status_code, status_name);
-  printf("this is header %s", header);
   send(desc, header, strlen(header), 0);
   sprintf(header, "Content-type: %s\n\n", content_type);
-  printf("this is header %s", header);
 
   send(desc, header, strlen(header), 0);
   if(content != NULL) {
     send(desc, content, content_length, 0);
   }
   send(desc, "\n", strlen("\n"), 0);
-  printf("we get to the end of send\n");
   close(desc);
 }
 
