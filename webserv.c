@@ -125,12 +125,10 @@ void *request_deal(void *socket_descriptor) {
   //populate array with header value and content
   for(int i = 0; i < MAX_FIELDS; i++) {
     headers[i].key = strtok(NULL, ":");
-    printf("this is headers[i].key: %s, this is i: %d \n", headers[i].key, i);
     if(headers[i].key == NULL || strcmp(headers[i].key, "\n") == 0) {
       break;
     }
     headers[i].value = strtok(NULL, "\n");
-    printf("this is headers[i].value: %s, this is i: %d \n", headers[i].value, i);
     if(headers[i].value == NULL || strcmp(headers[i].value, "\n") == 0) {
       break;
     }
@@ -158,7 +156,6 @@ void make_https_response(int status_code, int desc, char *content, const char *c
   char * status_name;
   char header[40];
 
-  printf("This is the status code: %d\n", status_code);
   switch(status_code) {
     case OK:
       status_name = "OK";

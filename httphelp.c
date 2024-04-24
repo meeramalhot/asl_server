@@ -52,7 +52,6 @@ const char * get_mime(char *file)
     return "image/png";
   }
   else if (strcasecmp(dot, "gif") == 0) {
-    printf("we reach gif \n");
     return "image/gif";
   }
   /*FIX*/
