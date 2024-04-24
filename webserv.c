@@ -175,11 +175,10 @@ void make_https_response(int status_code, int desc, char *content, const char *c
   }
 
   sprintf(header, "HTTP/1.1 %d %s\n", status_code, status_name);
+  printf("this is header %s", header);
   send(desc, header, strlen(header), 0);
   sprintf(header, "Content-type: %s\n\n", content_type);
-
-  //?
-  memset(header, 0, sizeof(header));
+  printf("this is header %s", header);
 
   send(desc, header, strlen(header), 0);
   if(content != NULL) {
