@@ -74,7 +74,6 @@ void myServ(int port) {
       //thread to handle new request
       pthread_t request_thread;
       pthread_create(&request_thread, NULL, request_deal, (void *)new_sd);
-      printf("we create the thread \n");
       pthread_detach(request_thread);
   }
 
