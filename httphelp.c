@@ -56,7 +56,7 @@ const char * get_mime(char *file)
   }
   /*FIX*/
   else if (strcasecmp(dot, "cgi") == 0) {
-    return "image/gif";
+    return "text/html"; //changed from image/gif to text/html
   }
   else {
     return "text/html"; 

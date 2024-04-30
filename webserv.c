@@ -80,76 +80,91 @@ void myServ(int port) {
 }
 
 //parse HTTPS requests here
+//changes the requrest_deal to handle cgi files - ahmad 
 void *request_deal(void *socket_descriptor) {
-  //make sure desc is an int
-  int desc = (int)socket_descriptor;
+    int desc = (int)socket_descriptor;
 
-  char buffer[BUFFER_SIZE];
-  memset(buffer, 0, BUFFER_SIZE);
-  //number of characters recieved, stored into buffer
-  ssize_t buff_rec = recv(desc, buffer, BUFFER_SIZE, 0);
+    char buffer[BUFFER_SIZE];
+    memset(buffer, 0, BUFFER_SIZE);
+    recv(desc, buffer, BUFFER_SIZE, 0);
 
-  char * get_http = strtok(buffer, " ");
-  if(get_http == NULL) {
-    return NULL;
-  }
-
-  //not equal
-  if(strcmp(get_http, "GET") != 0) {
-    make_https_response(UNDEFINED, desc, NULL, "text/html", 0);
-    return NULL;
-  }
-
-  char * file_name = strtok(NULL, " ");
-  //check if filename starts with a slash and ignore it
-  if(file_name[0] == '/') {
-    //start at the second char
-    file_name = &file_name[1];
-  }
-
-  char * version = strtok(NULL, "\n");
-
-  //check if HTTP versions are corrext
-  if(strncmp(version, "HTTP/1.1", 8) != 0 && (strncmp(version, "HTTP/1.0", 8) != 0)) {
-    printf("version compare failed\n");
-    make_https_response(UNDEFINED, desc, NULL, "text/html", 0);
-    return NULL;
-  }
-
-  //ADD FLAG FOR TYPE OF HTTP
-
-  //can handle 5 rows of headers
-  header_field headers[MAX_FIELDS];
-
-  //populate array with header value and content
-  for(int i = 0; i < MAX_FIELDS; i++) {
-    headers[i].key = strtok(NULL, ":");
-    if(headers[i].key == NULL || strcmp(headers[i].key, "\n") == 0) {
-      break;
+    char *get_http = strtok(buffer, " ");
+    if (get_http == NULL) {
+        return NULL;
     }
-    headers[i].value = strtok(NULL, "\n");
-    if(headers[i].value == NULL || strcmp(headers[i].value, "\n") == 0) {
-      break;
+
+    if (strcmp(get_http, "GET") != 0) {
+        make_https_response(UNDEFINED, desc, NULL, "text/html", 0);
+        return NULL;
     }
-  }
 
-  FILE * fd = get_file_descriptor(file_name);
-  if (fd == NULL) {
-    //not found
-    make_https_response(NOT_FOUND, desc, NULL, "text/html", 0);
-    return NULL;
-  } else {
-    //found
-    long int size = get_file_size(fd);
-    //stores file contents in content buffer
-    char * content_buffer = malloc(size);
-    fread(content_buffer, 1, size, fd);
-    make_https_response(OK, desc, content_buffer, get_mime(file_name), size);
+    char *file_name = strtok(NULL, " ");
+    if (file_name[0] == '/') {
+        file_name = &file_name[1]; // Ignore the leading '/'
+    }
 
-    return NULL;
-  }
-  
+    char *version = strtok(NULL, "\r\n");
+    if (strncmp(version, "HTTP/1.1", 8) != 0 && strncmp(version, "HTTP/1.0", 8) != 0) {
+        make_https_response(UNDEFINED, desc, NULL, "text/html", 0);
+        return NULL;
+    }
+
+    // Header parsing (simplified and should be expanded based on requirements)
+    header_field headers[MAX_FIELDS];
+    int i = 0;
+    char *key, *value;
+    while ((key = strtok(NULL, ": ")) && (value = strtok(NULL, "\r\n")) && i < MAX_FIELDS) {
+        headers[i].key = key;
+        headers[i].value = value;
+        i++;
+    }
+
+    // Checking if the request is for a CGI script
+    if (strstr(file_name, ".cgi") != NULL) {
+        char *queryString = strchr(file_name, '?');
+        if (queryString) {
+            *queryString = '\0'; // Terminate the file_name at '?'
+            queryString++; // Start of the query string
+        }
+
+        // Set CGI environment variables
+        setenv("QUERY_STRING", queryString ? queryString : "", 1);
+        setenv("REQUEST_METHOD", "GET", 1);
+
+        // Execute CGI script
+        char command[1024];
+        snprintf(command, sizeof(command), "./%s", file_name);
+        FILE *pipe = popen(command, "r");
+        if (!pipe) {
+            make_https_response(NOT_FOUND, desc, NULL, "text/html", 0);
+            return NULL;
+        }
+
+        // Read the output of the script and send it as the response
+        char scriptOutput[BUFFER_SIZE];
+        size_t bytesRead = fread(scriptOutput, 1, BUFFER_SIZE, pipe);
+        pclose(pipe);
+
+        make_https_response(OK, desc, scriptOutput, "text/html", bytesRead);
+        return NULL;
+    }
+
+    // Handling static files
+    FILE *fd = get_file_descriptor(file_name);
+    if (fd == NULL) {
+        make_https_response(NOT_FOUND, desc, NULL, "text/html", 0);
+        return NULL;
+    } else {
+        long int size = get_file_size(fd);
+        char *content_buffer = malloc(size);
+        fread(content_buffer, 1, size, fd);
+        fclose(fd);
+        make_https_response(OK, desc, content_buffer, get_mime(file_name), size);
+        free(content_buffer);
+        return NULL;
+    }
 }
+
 
 void make_https_response(int status_code, int desc, char *content, const char *content_type, long int content_length) {
   char * status_name;

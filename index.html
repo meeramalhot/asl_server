@@ -13,6 +13,15 @@
     <main>
         <p>This project is designed to help learners of American Sign Language (ASL) improve their signing accuracy and fluency through real-time feedback and suggestions.</p>
         <p>Click <a href="about.html">here</a> to learn more about how our project works and the technology behind it.</p>
+     
+        <section>
+            <h2>Submit Your ASL Sign</h2>
+            <form action="http://10.239.172.181:8080/cgi-bin/asl_interpreter.cgi" method="get">
+                <label for="sign">Type your ASL sign name:</label>
+                <input type="text" id="sign" name="sign" required>
+                <button type="submit">Submit</button>
+            </form>
+        </section>
     </main>
 </body>
 </html>
