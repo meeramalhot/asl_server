@@ -6,7 +6,7 @@
 #include <time.h>
 #include <string.h>
 
-//get file descriptor to read and write to fd, will return -1 if file does not exist
+//get file descriptor to read and write to fd, will return NULL if file does not exist
 FILE * get_file_descriptor(const char *file_name){
   FILE * fd;
   fd = fopen(file_name, "r");
@@ -54,7 +54,6 @@ const char * get_mime(char *file)
   else if (strcasecmp(dot, "gif") == 0) {
     return "image/gif";
   }
-  /*FIX*/
   else if (strcasecmp(dot, "cgi") == 0) {
     return "text/html"; //changed from image/gif to text/html
   }
@@ -62,19 +61,3 @@ const char * get_mime(char *file)
     return "text/html"; 
   }
 }
-
-/*
-const char * format_time(void){
-    char output[40];
-    time_t rawtime;
-    struct tm * timeinfo;
-    
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    
-    sprintf(output, "Date: %d %d %d %d:%d:%d GMT", timeinfo->tm_mday,
-            timeinfo->tm_mon + 1, timeinfo->tm_year + 1900,
-            timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
-    return output;
-}
-*/
