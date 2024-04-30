@@ -109,7 +109,7 @@ void *request_deal(void *socket_descriptor) {
         return NULL;
     }
 
-    // Header parsing (simplified and should be expanded based on requirements)
+    // Header parsing
     header_field headers[MAX_FIELDS];
     int i = 0;
     char *key, *value;
