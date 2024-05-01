@@ -6,7 +6,18 @@
     <title>Welcome to the ASL Interpreter Project</title>
     <link rel="stylesheet" href="styles.css">
     <script>
-        
+        function get_letter(){
+        //send a request, take in the response and publish it
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                document.getElementById("letterbox").innerHTML = request.responseText;
+            }
+        }
+        request.open("GET", "cgi-bin/request_asl.cgi", true);
+        request.send();
+    }
+    setInterval(get_letter, 250);
     </script>
 </head>
 <body>
@@ -17,7 +28,7 @@
         <p>This project is designed to help learners of American Sign Language (ASL) improve their signing accuracy and fluency through real-time feedback and suggestions.</p>
         <p>Click <a href="about.html">here</a> to learn more about how our project works and the technology behind it.</p>
 
-        <div id="letterbox"> </div>
+        <div id="letterbox"></div>
     </main>
 </body>
 </html>

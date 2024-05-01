@@ -5,6 +5,8 @@ import pickle  # Import the pickle module for loading serialized Python objects
 import cv2  # Import OpenCV for handling image and video operations
 import mediapipe as mp  # Import the MediaPipe library for easy access to pre-trained models for hand tracking
 import numpy as np  # Import numpy for numerical operations
+import requests
+import sys
 
 model_dict = pickle.load(open('./model.p', 'rb'))  # Load the model from a pickle file
 model = model_dict['model']  # Retrieve the model from the dictionary
@@ -71,7 +73,9 @@ while True:  # Begin an infinite loop for real-time processing
 
             predicted_character = labels_dict[int(prediction[0])]  # Map prediction to corresponding character
 
-            print(predicted_character)
+            #TAKE IN THE ADDRESS OF THE SERVER AS A COMMAND LINE ARGUMENT
+            #LOCAL HOST BECOMES COMMAND LINE ARG
+            x = requests.post(f"http://{sys.argv[1]}/submit_letter", data={"letter":predicted_character})
             
         # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 0), 4)  # Draw a rectangle around the hand
         # cv2.putText(frame, predicted_character, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 0, 0), 3,

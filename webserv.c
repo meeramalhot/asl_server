@@ -66,7 +66,7 @@ void myServ(int port) {
   for (;;) {
       client_len = sizeof (client_name);
       new_sd = accept (sd, (struct sockaddr *) &client_name, &client_len);
-      printf ("Assigning new socket descriptor:  %d\n", new_sd);
+      //printf ("Assigning new socket descriptor:  %d\n", new_sd);
       
       if (new_sd < 0) {
 	      perror ("Server: accept() error");
@@ -94,11 +94,16 @@ void * submit_letter(int desc, char *offset){
   while ((key = strtok(NULL, "=")) && (value = strtok(NULL, "&\n")) && i < MAX_PARAMETERS) {
         parameters[i].key = key;
         parameters[i].value = value;
-        printf("key is: %s, value is: %s\n", key, value);
+        //printf("key is: %s, value is: %s\n", key, value);
 
         //point at the byte after the null byte of value string
         i++;
     }
+    if(i < 1) {
+     make_https_response(UNDEFINED, desc, NULL, "text/html", 0);
+     return NULL;
+    }
+
     //check is the first parameter is letter, then check send that letter
     if(strcmp(parameters[0].key, "letter")==0) {
       printf("this is letter: %s\n", parameters[0].value);
@@ -106,8 +111,9 @@ void * submit_letter(int desc, char *offset){
       make_https_response(OK, desc, "", "text/html", 0);
     } else {
       make_https_response(UNDEFINED, desc, NULL, "text/html", 0);
-
     }
+    return NULL;
+
 }
 
 void * handle_post(int desc) {
