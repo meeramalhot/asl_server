@@ -18,6 +18,8 @@
 #define OK 200
 
 #define MAX_FIELDS 32
+#define MAX_PARAMETERS 32
+
 
 typedef struct {
   char * key;
@@ -79,25 +81,54 @@ void myServ(int port) {
 
 }
 
-//parse HTTPS requests here
-//changes the requrest_deal to handle cgi files - ahmad 
-void *request_deal(void *socket_descriptor) {
-    int desc = (int)socket_descriptor;
+void * submit_letter(int desc, char *offset){
+  strtok(offset, "\n");
 
-    char buffer[BUFFER_SIZE];
-    memset(buffer, 0, BUFFER_SIZE);
-    recv(desc, buffer, BUFFER_SIZE, 0);
+  header_field parameters[MAX_PARAMETERS];
+  char *key, *value;
+  int i = 0;
 
-    char *get_http = strtok(buffer, " ");
-    if (get_http == NULL) {
-        return NULL;
+  while ((key = strtok(NULL, "=")) && (value = strtok(NULL, "&\n")) && i < MAX_PARAMETERS) {
+        parameters[i].key = key;
+        parameters[i].value = value;
+        //point at the byte after the null byte of value string
+        i++;
     }
 
-    if (strcmp(get_http, "GET") != 0) {
+    //check is the first parameter is letter, then check send that letter
+
+}
+
+void * handle_post(int desc) {
+    char *function = strtok(NULL, " ");
+    char *version = strtok(NULL, "\r\n");
+    if (strncmp(version, "HTTP/1.1", 8) != 0 && strncmp(version, "HTTP/1.0", 8) != 0) {
         make_https_response(UNDEFINED, desc, NULL, "text/html", 0);
         return NULL;
     }
 
+    // Header parsing
+    header_field headers[MAX_FIELDS];
+    int i = 0;
+    char *key, *value;
+    char *offset;
+    while ((key = strtok(NULL, ": ")) && (value = strtok(NULL, "\r\n")) && i < MAX_FIELDS) {
+        headers[i].key = key;
+        headers[i].value = value;
+        //point at the byte after the null byte of value string
+        offset = value + strlen(value) + 1;
+        i++;
+    }
+
+    if (strcmp(function, "submit_letter")==0) {
+      return submit_letter(desc, offset);
+    } else {
+      make_https_response(NOT_FOUND, desc, NULL, "text/html", 0);
+      return NULL;
+    }
+}
+
+void * handle_get(int desc) {
     char *file_name = strtok(NULL, " ");
     if (file_name[0] == '/') {
         file_name = &file_name[1]; // Ignore the leading '/'
@@ -162,6 +193,31 @@ void *request_deal(void *socket_descriptor) {
         make_https_response(OK, desc, content_buffer, get_mime(file_name), size);
         free(content_buffer);
         return NULL;
+    }
+
+}
+
+//parse HTTPS requests here
+//changes the requrest_deal to handle cgi files - ahmad 
+void *request_deal(void *socket_descriptor) {
+    int desc = (int)socket_descriptor;
+
+    char buffer[BUFFER_SIZE];
+    memset(buffer, 0, BUFFER_SIZE);
+    recv(desc, buffer, BUFFER_SIZE, 0);
+
+    char *get_http = strtok(buffer, " ");
+    if (get_http == NULL) {
+        return NULL;
+    }
+
+    if (strcmp(get_http, "GET") == 0) {
+      return handle_get(desc);
+    }else if(strcmp(get_http, "POST") == 0){
+      return handle_post(desc);
+    }else{
+      make_https_response(UNDEFINED, desc, NULL, "text/html", 0);
+      return NULL;
     }
 }
 

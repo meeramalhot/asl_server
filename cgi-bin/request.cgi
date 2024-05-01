@@ -1,5 +1,7 @@
-#!/Users/muhammadahmadghani/anaconda3/bin/python3 
-#the above is different for all machines might have to change it 
+#!/usr/bin/python3
+"""!/Users/muhammadahmadghani/anaconda3/bin/python3"""
+#the above is different for all machines might have to change it
+
 import cgi
 import cgitb; cgitb.enable()  # Enable CGI error reporting
 
