@@ -82,6 +82,7 @@ void myServ(int port) {
 }
 
 void * submit_letter(int desc, char *offset){
+  printf("we are in submit letter \n");
   //after headers, extra /n
   strtok(offset, "\n");
 
@@ -93,17 +94,28 @@ void * submit_letter(int desc, char *offset){
   while ((key = strtok(NULL, "=")) && (value = strtok(NULL, "&\n")) && i < MAX_PARAMETERS) {
         parameters[i].key = key;
         parameters[i].value = value;
+        printf("key is: %s, value is: %s\n", key, value);
+
         //point at the byte after the null byte of value string
         i++;
     }
     //check is the first parameter is letter, then check send that letter
     if(strcmp(parameters[0].key, "letter")==0) {
+      printf("this is letter: %s\n", parameters[0].value);
       setenv("letter", parameters[0].value, 1);
+      make_https_response(OK, desc, "", "text/html", 0);
+    } else {
+      make_https_response(UNDEFINED, desc, NULL, "text/html", 0);
+
     }
 }
 
 void * handle_post(int desc) {
+  printf("we get to handle post\n");
     char *function = strtok(NULL, " ");
+    if (function[0] == '/') {
+        function = &function[1]; // Ignore the leading '/'
+    }
     char *version = strtok(NULL, "\r\n");
     if (strncmp(version, "HTTP/1.1", 8) != 0 && strncmp(version, "HTTP/1.0", 8) != 0) {
         make_https_response(UNDEFINED, desc, NULL, "text/html", 0);
@@ -123,6 +135,7 @@ void * handle_post(int desc) {
         i++;
     }
 
+    printf("function is: %s\n", function);
     if (strcmp(function, "submit_letter")==0) {
       return submit_letter(desc, offset);
     } else {
