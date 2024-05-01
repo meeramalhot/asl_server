@@ -82,8 +82,10 @@ void myServ(int port) {
 }
 
 void * submit_letter(int desc, char *offset){
+  //after headers, extra /n
   strtok(offset, "\n");
 
+  //parsing letter=char values
   header_field parameters[MAX_PARAMETERS];
   char *key, *value;
   int i = 0;
@@ -94,9 +96,10 @@ void * submit_letter(int desc, char *offset){
         //point at the byte after the null byte of value string
         i++;
     }
-
     //check is the first parameter is letter, then check send that letter
-
+    if(strcmp(parameters[0].key, "letter")==0) {
+      setenv("letter", parameters[0].value, 1);
+    }
 }
 
 void * handle_post(int desc) {
