@@ -1,6 +1,6 @@
 # asl_server
 
-**How to run:** <br />
+**How to run a sample web page at a time:** <br />
 make <br />
 ./webserv 8080 <br />
 http://localhost:8080/src/index.html
