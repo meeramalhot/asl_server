@@ -5,7 +5,7 @@ make <br />
 ./webserv 8080 <br />
 http://localhost:8080/src/index.html
 
-**To run the python scripts:** 
+**How to run the python scripts:** 
 - Run the 'collect_images.py' and record however many ASL hand signs you would like. Terminate this program when you are done.
 - After this, run the 'dataset_builder.py' and allow it to create the dataset from the collected images. Once this has complete, move onto the next step.
 - Next, run the 'train_classifier.py' file and allow the ML algorithm to do its magic!
