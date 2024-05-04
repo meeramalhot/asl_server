@@ -2,8 +2,8 @@
 
 **How to run a sample web page at a time:** <br />
 make <br />
-./webserv 8080 <br />
-http://localhost:8080/src/index.html
+./webserv 9000 <br />
+http://localhost:9000/src/index.html
 
 **How to run the python scripts:** 
 - First run the server and detatch tell shell to detatch the process
