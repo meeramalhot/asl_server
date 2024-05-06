@@ -16,7 +16,7 @@ http://localhost:9000/src/index.html
 - After this, run the 'python dataset_builder.py' and allow it to create the dataset from the collected images. Once this has complete, move onto the next step.
 - Next, run the 'python train_classifier.py' file and allow the ML algorithm to classify everything
 
-- Finally, on completion of all the previous scripts, you can run this 'on-going, active' script where the magic happens. You will position the camera aimed at your hand, run the 'python classifier.py localhost:8080' script and start practicing your ASL in front of the camera.
+- Finally, on completion of all the previous scripts, you can run this 'on-going, active' script where the magic happens. You will position the camera aimed at your hand, run the 'python classifier.py localhost:8000' script and start practicing your ASL in front of the camera.
 
 - This will output the associated ASCII text to the webserver.
 - If you want to test with curl, use: curl -X POST -d "letter=c" http://localhost:8000/submit_letter
