@@ -19,6 +19,6 @@ http://localhost:9000/src/index.html
 - Finally, on completion of all the previous scripts, you can run this 'on-going, active' script where the magic happens. You will position the camera aimed at your hand, run the 'python classifier.py localhost:8080' script and start practicing your ASL in front of the camera.
 
 - This will output the associated ASCII text to the webserver.
-- If you want to test with curl, use: curl -X POST -d "letter=c" http://localhost:8080/submit_letter
+- If you want to test with curl, use: curl -X POST -d "letter=c" http://localhost:8000/submit_letter
   
 - **NOTE**: use **ONE** hand at a time. We cannot handle more than that at the moment. :)
