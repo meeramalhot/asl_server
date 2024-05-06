@@ -1,4 +1,4 @@
-#!/Users/muhammadahmadghani/anaconda3/bin/python3
+#!/home/cs410/Desktop/projects/projectsenv/bin/python
 
 import os
 import sys

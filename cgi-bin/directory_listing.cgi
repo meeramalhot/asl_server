@@ -1,4 +1,4 @@
-#!/bin/sh
+#!usr/bin/sh
 
 # HTTP headers
 echo "Content-Type: text/html"

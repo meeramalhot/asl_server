@@ -1,4 +1,4 @@
-#!/Users/muhammadahmadghani/anaconda3/bin/python
+#!/home/cs410/Desktop/projects/projectsenv/bin/python
 #the above is different for all machines might have to change it
 import os
 #import cgitb; cgitb.enable()  # Enable CGI error reporting
