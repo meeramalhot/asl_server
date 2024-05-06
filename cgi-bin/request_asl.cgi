@@ -1,7 +1,7 @@
-#!/usr/bin/python3
+#!/Users/muhammadahmadghani/anaconda3/bin/python
 #the above is different for all machines might have to change it
 import os
-import cgitb; cgitb.enable()  # Enable CGI error reporting
+#import cgitb; cgitb.enable()  # Enable CGI error reporting
 
 print("Content-Type: text/html")  # HTML is following
 print()                           # blank line, end of headers

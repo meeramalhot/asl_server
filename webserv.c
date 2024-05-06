@@ -10,6 +10,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "httphelp.h"
+#include <dirent.h> 
 
 
 #define BUFFER_SIZE 900
@@ -150,11 +151,46 @@ void * handle_post(int desc) {
     }
 }
 
+
+void handle_directory_request(int desc, const char *directory_path) {
+    // Open the directory
+    DIR *dir = opendir(directory_path); 
+    if (dir == NULL) {
+        make_https_response(NOT_FOUND, desc, "Directory not found", "text/html", strlen("Directory not found"));
+        return;
+    }
+
+    char html_content[BUFFER_SIZE];
+    snprintf(html_content, BUFFER_SIZE, "<html><head><title>Directory Listing</title></head><body><h1>Directory Listing</h1><ul>");
+
+    // Read the directory entries
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) {
+        // Append each entry to the HTML content
+        char entry_link[BUFFER_SIZE];
+        snprintf(entry_link, BUFFER_SIZE, "<li><a href=\"%s\">%s</a></li>", entry->d_name, entry->d_name);
+        strncat(html_content, entry_link, BUFFER_SIZE - strlen(html_content) - 1);
+    }
+
+    closedir(dir);
+    strncat(html_content, "</ul></body></html>", BUFFER_SIZE - strlen(html_content) - 1);
+
+    // Send the HTML response
+    make_https_response(OK, desc, html_content, "text/html", strlen(html_content));
+}
+
 void * handle_get(int desc) {
     char *file_name = strtok(NULL, " ");
     if (file_name[0] == '/') {
         file_name = &file_name[1]; // Ignore the leading '/'
     }
+  //check if directory 
+    struct stat path_stat;
+    if (stat(file_name, &path_stat) == 0 && S_ISDIR(path_stat.st_mode)) {
+        handle_directory_request(desc, file_name);
+        return NULL;
+    }
+
 
     char *version = strtok(NULL, "\r\n");
     if (strncmp(version, "HTTP/1.1", 8) != 0 && strncmp(version, "HTTP/1.0", 8) != 0) {
@@ -171,6 +207,13 @@ void * handle_get(int desc) {
         headers[i].value = value;
         i++;
     }
+
+    //Error handling for nonexisting files 
+    FILE *file_descriptor = fopen(file_name, "r"); // Attempt to open the file
+if (file_descriptor == NULL) {
+    make_https_response(NOT_FOUND, desc, "File not found, Error 404", "text/html", strlen("File not found, Error 404"));
+    return NULL;
+}
 
     // Checking if the request is for a CGI script
     if (strstr(file_name, ".cgi") != NULL) {

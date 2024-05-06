@@ -45,7 +45,11 @@ def count_file_types(directory):
                 type_counts['character'] += 1
     return type_counts
 
-def plot_histogram(data, output_path='file_type_histogram.jpeg'):
+def plot_histogram(data, filename='file3_type_histogram.jpeg'):
+    # path to save the image 
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    output_path = os.path.join(script_dir, filename)
+
     types = list(data.keys())
     counts = list(data.values())
     plt.figure(figsize=(10, 6))
@@ -57,7 +61,7 @@ def plot_histogram(data, output_path='file_type_histogram.jpeg'):
     return output_path
 
 def print_html(image_path):
-    print("""
+    print(f"""
     <html>
     <head>
         <title>CS410 Webserver</title>
@@ -73,24 +77,70 @@ def print_html(image_path):
             }}
             img {{
                 display: block;
-                margin: 20px auto;
+                margin: auto;
+            }}
+            form {{
+                text-align: center;
+                margin-top: 20px;
             }}
         </style>
     </head>
     <body>
         <h1>CS410 Webserver</h1>
-        <img src='{}' alt='File Type Histogram'>
+        <img src='{os.path.basename(image_path)}' alt='File Type Histogram'>
+        <form action='' method='get'>
+            <input type='text' name='directory' placeholder='Enter directory path'>
+            <input type='submit' value='Generate Histogram'>
+        </form>
     </body>
     </html>
-    """.format(image_path))
+    """)
+
 
 # Setup CGI and read parameters
 form = cgi.FieldStorage()
 directory = form.getvalue('directory')
 
 if directory:
-    file_type_counts = count_file_types(directory)
-    image_path = plot_histogram(file_type_counts)
-    print_html(image_path)
+    if os.path.exists(directory):
+        file_type_counts = count_file_types(directory)
+        image_path = plot_histogram(file_type_counts)
+        print_html(image_path)
+    else:
+        print("<html><body><h1>Error: Directory does not exist.</h1></body></html>")
 else:
-    print("<html><body><h1>Error: No directory provided or directory does not exist.</h1></body></html>")
+    print(f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Type Histogram</title>
+    <link rel="stylesheet" href="style-hist.css">
+</head>
+<body>
+    <header>
+        <h1>File Type Histogram Generator</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">ASL</a></li>
+                <li><a href="../about.html">About</a></li>
+                <li><a href="/src/index.html">Gif</a></li>
+                <li><a href="/cgi-bin/directory_listing.cgi">CGI 'sh'</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <form action="" method="get">
+            <input type="text" name="directory" placeholder="Enter directory path" style="width: 70%;">
+            <input type="submit" value="Generate Histogram">
+        </form>
+    </main>
+    <footer>
+         <p>&copy; Project by Meera Malhotra, Isabella Teixeira & Muhammad Ahmad Ghani.</p>
+    </footer>
+</body>
+</html>
+
+
+    """)

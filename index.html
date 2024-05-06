@@ -7,28 +7,41 @@
     <link rel="stylesheet" href="styles.css">
     <script>
         function get_letter(){
-        //send a request, take in the response and publish it
-        var request = new XMLHttpRequest();
-        request.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                document.getElementById("letterbox").innerHTML = request.responseText;
-            }
+            var request = new XMLHttpRequest();
+            request.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    document.getElementById("letterbox").innerHTML = this.responseText;
+                }
+            };
+            request.open("GET", "cgi-bin/request_asl.cgi", true);
+            request.send();
         }
-        request.open("GET", "cgi-bin/request_asl.cgi", true);
-        request.send();
-    }
-    setInterval(get_letter, 250);
+        setInterval(get_letter, 250);
     </script>
 </head>
 <body>
     <header>
         <h1>Welcome to the ASL Interpreter Project</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">ASL</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="/cgi-bin/my_histogram.cgi">Histogram</a></li>
+                <li><a href="/src/index.html"> Gif</a></li>
+                <li><a href="/cgi-bin/directory_listing.cgi">CGI 'sh'</a></li>
+                <li><a href="/nonexistingfile.html">Non-Existing File</a></li>
+                <li><a href="/cgi-bin">Directory List</a></li>
+                
+
+            </ul>
+        </nav>
     </header>
     <main>
-        <p>This project is designed to help learners of American Sign Language (ASL) improve their signing accuracy and fluency through real-time feedback and suggestions.</p>
-        <p>Click <a href="about.html">here</a> to learn more about how our project works and the technology behind it.</p>
-
-        <div id="letterbox"></div>
+        <p>This project showcases real-time American Sign Language (ASL) interpretation captured through a Raspberry Pi camera, where our advanced machine learning algorithms analyze and translate ASL gestures. This platform provides immediate feedback and suggestions to help learners improve their signing accuracy and fluency.</p>
+        <div id="letterbox">Waiting for data...</div>
     </main>
+    <footer>
+        <p>&copy; Project by Meera Malhotra, Isabella Teixeira & Muhammad Ahmad Ghani.</p>
+    </footer>
 </body>
 </html>

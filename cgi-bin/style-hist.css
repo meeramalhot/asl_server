@@ -1,4 +1,3 @@
-
 * {
     margin: 0;
     padding: 0;
@@ -49,10 +48,9 @@ nav ul li a:hover {
 main {
     background-color: white;
     padding: 20px;
-    flex: 1;
     border-radius: 10px;
     margin: 20px auto;
-    max-width: 900px;
+    width: 900px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
